@@ -26,4 +26,10 @@ jobs:
       - name: Check legacy API
         run: npm test
       - name: Check v1 contract
-        run: npm run contract
+        run: npm run contract 2>&1 | tee contract-run-final.txt
+      - name: Keep the final contract transcript
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: contract-run-final
+          path: contract-run-final.txt

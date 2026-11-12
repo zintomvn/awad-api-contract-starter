@@ -101,6 +101,9 @@ function parseCursor(token, tableId) {
 }
 
 export function createV1(db) {
+  // Track requests while their bodies are still arriving. SQLite serializes
+  // completed writes, but it cannot see a request that has not begun a write.
+  const inFlightKeys = new Set();
   const q = {
     menu: db.prepare('SELECT id, name, price_vnd AS priceVnd FROM menu_items WHERE id = ?'),
     order: db.prepare('SELECT id, table_id AS tableId, total_vnd AS totalVnd, created_at AS createdAt FROM orders WHERE id = ?'),
@@ -136,6 +139,17 @@ export function createV1(db) {
       return;
     }
 
+    // Reserve the key before awaiting a potentially slow request body. A
+    // competing request parses its own JSON before checking the reservation,
+    // as required by the contract's error-precedence rules.
+    const ownsReservation = !inFlightKeys.has(key);
+    if (ownsReservation) {
+      inFlightKeys.add(key);
+      // Release on success, an error response, or a disconnected client.
+      const release = () => inFlightKeys.delete(key);
+      res.once('finish', release);
+      res.once('close', release);
+    }
     let body;
     try {
       body = JSON.parse(await readRaw(req));
@@ -145,6 +159,12 @@ export function createV1(db) {
     }
 
     const fingerprint = canonicalJson(body);
+    // If a successful response already exists, the new request is a replay,
+    // even if another replay is currently reading its body.
+    if (!ownsReservation && inFlightKeys.has(key) && !q.seenKey.get(key)) {
+      sendV1Problem(res, 'idempotency-key-in-flight', 'The first request with this key is still in progress.');
+      return;
+    }
     // The lock covers the lookup as well as the insert, including requests from
     // another Node process using the same SQLite database file.
     db.exec('BEGIN IMMEDIATE');

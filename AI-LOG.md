@@ -1,4 +1,4 @@
-﻿# AI-LOG.md — IA#3 API contract
+# AI-LOG.md — IA#3 API contract
 
 Date: 2026-11-12
 Tool throughout: ChatGPT (GPT-6 via Codex Native2, working in the local repository).
@@ -58,5 +58,13 @@ Asked for: Check the current submission against the IA#3 rubric, improve the evi
 Kept: The original `contract-run-1.txt`, the successful Ubuntu Node.js 22 `contract-run-final.txt`, the existing /v1 code and migrations, and the original commit sequence.
 Changed: Re-ran migration, seeding, legacy and contract scripts on Windows (legacy 3/3; contract 27 passed, 0 assertions failed, 2 cancelled), then independently reproduced the suite's `spawnSync` failure. Its `new URL('..', import.meta.url).pathname` produces a non-native Windows `cwd` (`/D:/...` with URL-escaped spaces), yielding `ENOENT` and a null process status. Documented the confirmed setup cause in `NOTES.md` and revised the rubric score with specific evidence.
 Rejected: Modifying the forbidden `test/` path to fix the Windows-only suite setup or overwriting the authentic first-run and Linux-final transcripts with a known incomplete Windows rerun. Did not claim that the historical predictions were independently drafted without AI.
+
+## 2026-11-12 - HTTP 409 timing review and focused correction
+
+Tool: ChatGPT (GPT-6 via Codex Native2).
+Asked for: Examine and improve HTTP 409 for a duplicate idempotency key while the first request is still processing, then rerun checks.
+Kept: The successful-response SQLite transaction, the persisted replay fingerprint and Location, existing tests, and the frozen contract.
+Changed: Reproduced a slow-body race where the second request received 201 before the first body finished; added a per-instance in-flight key reservation which returns the section 4.2 409 problem while the first request remains active. Retested the 409/201/replay sequence and the malformed-JSON/400/corrected-201 sequence. Local Windows checks still show 3/3 legacy passes and the documented two cross-instance test harness cancellations.
+Rejected: Reporting this as a verified distributed 409 guarantee; two independent processes share the completed SQLite key but do not share the early in-memory reservation. No third-party dependency was added.
 
 No test files or CONTRACT.md were edited, and no new dependency was added.
