@@ -1,4 +1,4 @@
-﻿import { send, readRaw } from './http.js';
+import { send, readRaw } from './http.js';
 
 // RFC 9457 problems are separate from the legacy { error, message } format.
 const problems = {
@@ -31,9 +31,9 @@ function isIntegerIn(value, min, max) {
 }
 
 function pathId(text) {
-  if (!/^[1-9][0-9]*$/.test(text)) return null;
+  if (!/^[0-9]+$/.test(text)) return null;
   const id = Number(text);
-  return Number.isSafeInteger(id) ? id : null;
+  return Number.isSafeInteger(id) && id > 0 ? id : null;
 }
 
 // Object member order is irrelevant to JSON equality; array order is significant.
@@ -128,10 +128,6 @@ export function createV1(db) {
     };
   }
 
-  function placeOrder(req, res) {
-    // Checked after JSON parsing by the async wrapper below.
-    throw new Error('The request body must be parsed first.');
-  }
 
   async function postOrder(req, res) {
     const key = req.headers['idempotency-key'];
