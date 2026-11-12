@@ -24,7 +24,7 @@ Rejected: The first draft's unused placeOrder function, which threw an error but
 Tool: ChatGPT (GPT-6 via Codex Native2).
 Asked for (fix/diagnosis prompt): “Investigate ‘§4.2 a retry that lands on the other instance is still a replay’ using CONTRACT.md §4.2 and ‘§4.4 a cursor from one instance works on the other’ using CONTRACT.md §4.4. Use only those test names and contract sections, without reading or editing test code.”
 Kept: The shared-database key record and self-contained cursor; a direct two-server HTTP check passed for both behaviors and concurrent duplicates.
-Changed: Diagnosed two cancelled tests as a Windows Node child-process setup issue (spawnSync('npm') returned ENOENT), not a proven API assertion failure. The authentic first-run output was committed at 5c5b48e and its encoding converted to UTF-8 at f6ba33c, without rerunning it.
+Changed: Diagnosed two cancelled tests as a Windows child-process setup issue (the suite's Node migration subprocess had a null exit status), not a proven API assertion failure. A separate npm spawn check returned ENOENT but did not establish the suite's precise cause. The authentic first-run output was committed at 5c5b48e and its encoding converted to UTF-8 at f6ba33c, without rerunning it.
 Rejected: Any change to test/ or CONTRACT.md to hide the environment failure. A runtime diagnostic instrumentation attempt was blocked by the local execution policy and was not used.
 
 ## 2026-11-12 — Post-run review and implementation correction
@@ -41,6 +41,14 @@ Tool: ChatGPT (GPT-6 via Codex Native2).
 Asked for: “Which sentences of CONTRACT.md could be read two ways, and what did you choose for each?” Also asked for NOTES.md explanations, AI-LOG.md, and SELF_ASSESSMENT_REPORT.md using the supplied rubric and formats.
 Kept: Five agent-identified ambiguity decisions and the additional leading-zero review point, with proposed clarification sentences in NOTES.md.
 Changed: Distinguished the two cancelled cross-instance tests from failed API assertions; scored the submission using actual test outcomes and commit evidence.
-Rejected: Claiming 29/29 or suppressing the real Windows setup limitation. The final contract transcript records 27 passed, 0 failed, and 2 cancelled.
+Rejected: Claiming 29/29 before it had been verified, or suppressing the real Windows setup limitation. The pre-CI transcript recorded 27 passed, 0 failed, and 2 cancelled.
+
+## 2026-11-12 — CI rerun and final contract evidence
+
+Tool: ChatGPT (GPT-6 via Codex Native2, with GitHub Actions job-log access).
+Asked for: Rerun the contract tests, fix remaining contract problems if found, and update the student GitHub repository.
+Kept: The existing /v1 implementation and the unchanged test/ and CONTRACT.md files. The Ubuntu Node 22 workflow passed the legacy suite (3/3) and the full contract suite (29/29), including the two cross-instance cases.
+Changed: Saved the successful CI contract output to contract-run-final.txt with the job URL and tested commit identified; updated NOTES.md and SELF_ASSESSMENT_REPORT.md using the new evidence. No source-code correction was necessary.
+Rejected: Introducing a code change merely to address the Windows test-launch anomaly or presenting CI output as a local Windows test run.
 
 No test files or CONTRACT.md were edited, and no new dependency was added.

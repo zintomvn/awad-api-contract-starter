@@ -1,100 +1,74 @@
+# Contract run on GitHub Actions (Ubuntu, Node.js 22)
+# Workflow: https://github.com/zintomvn/awad-api-contract-starter/actions/runs/43198372757
+# Commit tested: 4e8434f0448274aa9ac082361bf551cbec10b326
+# Date: 2026-11-12 (UTC)
+# Exact command output extracted from the successful job log; GitHub timestamps removed.
 
 > awad-api-contract-starter@1.0.0 contract
 > node --test --test-reporter=spec test/contract.test.js
 
+(node:2532) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
 ▶ §2 errors
-  ✔ §2 an unknown /v1 path is a 404 problem (38.6333ms)
-  ✔ §2 malformed JSON is 400 invalid-json (6.9213ms)
-  ✔ §2 validation lists every broken field, with a JSON Pointer each (3.9982ms)
-  ✔ §2 a JSON body that is not an object is a validation error, not a crash (9.8695ms)
+  ✔ §2 an unknown /v1 path is a 404 problem (29.486094ms)
+  ✔ §2 malformed JSON is 400 invalid-json (10.218905ms)
+  ✔ §2 validation lists every broken field, with a JSON Pointer each (6.162669ms)
+  ✔ §2 a JSON body that is not an object is a validation error, not a crash (13.287958ms)
 Error: no such table: orders
-    at getOrder (file:///D:/University/Semester%2010/Web%20dev%20(advance)/IA/IA%203/awad-api-contract-starter/src/v1.js:120:27)
-    at handleV1 (file:///D:/University/Semester%2010/Web%20dev%20(advance)/IA/IA%203/awad-api-contract-starter/src/v1.js:250:44)
-    at handle (file:///D:/University/Semester%2010/Web%20dev%20(advance)/IA/IA%203/awad-api-contract-starter/src/app.js:65:13)
-    at Server.<anonymous> (file:///D:/University/Semester%2010/Web%20dev%20(advance)/IA/IA%203/awad-api-contract-starter/src/app.js:72:5)
-    at Server.emit (node:events:509:28)
-    at parserOnIncoming (node:_http_server:1213:12)
+    at getOrder (file:///home/runner/work/awad-api-contract-starter/awad-api-contract-starter/src/v1.js:120:27)
+    at handleV1 (file:///home/runner/work/awad-api-contract-starter/awad-api-contract-starter/src/v1.js:250:44)
+    at handle (file:///home/runner/work/awad-api-contract-starter/awad-api-contract-starter/src/app.js:65:13)
+    at Server.<anonymous> (file:///home/runner/work/awad-api-contract-starter/awad-api-contract-starter/src/app.js:72:5)
+    at Server.emit (node:events:519:28)
+    at parserOnIncoming (node:_http_server:1186:12)
     at HTTPParser.parserOnHeadersComplete (node:_http_common:125:17) {
   code: 'ERR_SQLITE_ERROR',
   errcode: 1,
   errstr: 'SQL logic error'
 }
-  ✔ §2 a 500 is a problem that says nothing about the inside (9.0798ms)
-✔ §2 errors (70.59ms)
+  ✔ §2 a 500 is a problem that says nothing about the inside (11.00044ms)
+✔ §2 errors (73.684718ms)
 ▶ §4.1 menu
-  ✔ §4.1 GET /v1/menu/{id} returns priceVnd in dong (5.7806ms)
-  ✔ §4.1 unknown or malformed id is 404 not-found (3.3022ms)
-✔ §4.1 menu (9.3708ms)
+  ✔ §4.1 GET /v1/menu/{id} returns priceVnd in dong (10.56774ms)
+  ✔ §4.1 unknown or malformed id is 404 not-found (4.940681ms)
+✔ §4.1 menu (15.976968ms)
 ▶ §4.2 placing an order
-  ✔ §4.2 201, Location, totals in dong, lines in the order sent (5.0635ms)
-  ✔ §4.2 unknown menu item is 422 with a pointer per unknown line (2.0079ms)
-  ✔ §4.2 rules on fields: tableId 1..200, 1..20 lines, qty 1..20 (9.4026ms)
-  ✔ §4.2 a unit price is the price when the order was placed (5.3962ms)
-  ✔ §4.3 GET /v1/orders/{id} of an unknown order is 404 not-found (1.177ms)
-✔ §4.2 placing an order (23.433ms)
+  ✔ §4.2 201, Location, totals in dong, lines in the order sent (6.548492ms)
+  ✔ §4.2 unknown menu item is 422 with a pointer per unknown line (3.141726ms)
+  ✔ §4.2 rules on fields: tableId 1..200, 1..20 lines, qty 1..20 (14.070266ms)
+  ✔ §4.2 a unit price is the price when the order was placed (9.416032ms)
+  ✔ §4.3 GET /v1/orders/{id} of an unknown order is 404 not-found (2.275065ms)
+✔ §4.2 placing an order (36.131889ms)
 ▶ §4.2 idempotency
-  ✔ §4.2 no Idempotency-Key is 400 and creates nothing (5.1482ms)
-  ✔ §4.2 the key is checked before the body (1.6179ms)
-  ✔ §4.2 a retry with the same key and body replays the first response (3.7266ms)
-  ✔ §4.2 "the same body" means the same JSON value: key order and whitespace do not matter (4.3124ms)
-  ✔ §4.2 the same key with a different body is 422 and creates nothing (3.203ms)
-  ✔ §4.2 only a 201 is stored: after a 4xx the same key may be used with a fixed body (4.3786ms)
-  ✔ §4.2 the same key sent five times at once places one order (10.4287ms)
-✔ §4.2 idempotency (33.2178ms)
+  ✔ §4.2 no Idempotency-Key is 400 and creates nothing (5.960586ms)
+  ✔ §4.2 the key is checked before the body (1.56351ms)
+  ✔ §4.2 a retry with the same key and body replays the first response (4.003499ms)
+  ✔ §4.2 "the same body" means the same JSON value: key order and whitespace do not matter (3.264103ms)
+  ✔ §4.2 the same key with a different body is 422 and creates nothing (4.226512ms)
+  ✔ §4.2 only a 201 is stored: after a 4xx the same key may be used with a fixed body (6.456342ms)
+  ✔ §4.2 the same key sent five times at once places one order (11.762298ms)
+✔ §4.2 idempotency (37.763241ms)
 ▶ §4.4 pagination
-  ✔ §4.4 newest first; every order exactly once; default page size 20 (26.8817ms)
-  ✔ §4.4 nextCursor is null exactly when there is nothing more (9.8662ms)
-  ✔ §4.4 an order placed between two pages does not shift the next page (9.7465ms)
-  ✔ §4.4 out-of-range limit is an error, not clamped (4.2375ms)
-  ✔ §4.4 a cursor the server cannot read is 400 validation (2.414ms)
-✔ §4.4 pagination (53.3943ms)
+  ✔ §4.4 newest first; every order exactly once; default page size 20 (31.486401ms)
+  ✔ §4.4 nextCursor is null exactly when there is nothing more (10.425047ms)
+  ✔ §4.4 an order placed between two pages does not shift the next page (10.261104ms)
+  ✔ §4.4 out-of-range limit is an error, not clamped (7.134265ms)
+  ✔ §4.4 a cursor the server cannot read is 400 validation (3.355341ms)
+✔ §4.4 pagination (63.037351ms)
 ▶ §5 versions and the legacy API
-  ✔ §5 legacy GET /menu/{id} is unchanged, and announces its end (2.7487ms)
-  ✔ §5 legacy errors keep their old shape — the new error model is for /v1 only (2.3035ms)
-  ✔ §5 a price written through the legacy API reads the same through v1 (1.9854ms)
-✔ §5 versions and the legacy API (7.2063ms)
+  ✔ §5 legacy GET /menu/{id} is unchanged, and announces its end (2.27753ms)
+  ✔ §5 legacy errors keep their old shape — the new error model is for /v1 only (2.459656ms)
+  ✔ §5 a price written through the legacy API reads the same through v1 (2.095402ms)
+✔ §5 versions and the legacy API (7.042315ms)
 ▶ §4 two instances, one database (as in session 4)
-  ✖ §4.2 a retry that lands on the other instance is still a replay
-  ✖ §4.4 a cursor from one instance works on the other
-✖ §4 two instances, one database (as in session 4) (2.9031ms)
+  ✔ §4.2 a retry that lands on the other instance is still a replay (12.691445ms)
+  ✔ §4.4 a cursor from one instance works on the other (17.842071ms)
+✔ §4 two instances, one database (as in session 4) (203.334534ms)
 ℹ tests 29
 ℹ suites 7
-ℹ pass 27
+ℹ pass 29
 ℹ fail 0
-ℹ cancelled 2
+ℹ cancelled 0
 ℹ skipped 0
 ℹ todo 0
-ℹ duration_ms 321.3543
-
-✖ failing tests:
-
-test at test\contract.test.js:371:3
-✖ §4.2 a retry that lands on the other instance is still a replay
-  'test did not finish before its parent and was cancelled'
-
-test at test\contract.test.js:383:3
-✖ §4.4 a cursor from one instance works on the other
-  'test did not finish before its parent and was cancelled'
-
-test at test\contract.test.js:331:1
-✖ §4 two instances, one database (as in session 4) (2.9031ms)
-  AssertionError [ERR_ASSERTION]: npm run migrate failed: undefined
-  
-  null !== 0
-  
-      at SuiteContext.<anonymous> (file:///D:/University/Semester%2010/Web%20dev%20(advance)/IA/IA%203/awad-api-contract-starter/test/contract.test.js:363:12)
-      at TestHook.runInAsyncScope (node:async_hooks:227:14)
-      at TestHook.run (node:internal/test_runner/test:1201:25)
-      at TestHook.run (node:internal/test_runner/test:1528:18)
-      at TestHook.run (node:internal/util:602:20)
-      at Suite.runHook (node:internal/test_runner/test:1117:20)
-      at Suite.run (node:internal/test_runner/test:1613:18)
-      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
-      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
-    generatedMessage: false,
-    code: 'ERR_ASSERTION',
-    actual: null,
-    expected: 0,
-    operator: 'strictEqual',
-    diff: 'simple'
-  }
+ℹ duration_ms 563.042701
