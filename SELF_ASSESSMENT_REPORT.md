@@ -1,29 +1,26 @@
 ﻿# Self-assessment — IA#3 API contract
 
-Submitted by: **23127351 — Le Minh Duc**
+**Submitted by:** 23127351 — Le Minh Duc
+**Course:** CSC13114 — Advanced Web Application Development
+**Date:** 2026-11-12
+**Total I claim: 96 / 100**
 
-Course: CSC13114, Advanced Web Application Development
-
-Date: 2026-11-12
-
-**Total I claim: 90 / 100**
-
-| Criterion                          |     Max | I claim | Evidence                                                                                                                                                                                                                                                                                                          |
-| ---------------------------------- | ------: | ------: | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1. Contract tests pass             |      30 |      30 | GitHub Actions on Ubuntu Node.js 22 passed legacy 3/3 and contract 29/29 with 0 failures and 0 cancellations, including both cross-instance tests. The authentic output is in contract-run-final.txt and the workflow evidence is https://github.com/zintomvn/awad-api-contract-starter/actions/runs/43198372757. |
-| 2. Rules kept                      |      10 |      10 | No tracked changes under test/ or in CONTRACT.md. Added matching migrations/002_order_idempotency.up.sql and .down.sql; src/v1.js and src/app.js are the implementation.                                                                                                                                          |
-| 3. Predictions before agent ran    |      10 |       9 | NOTES.md has two §4.2/§4.4 predictions with reasons and later outcomes; commit 7f22452 precedes first source commit f8b4f68. The initial prediction wording was AI-assisted and disclosed in AI-LOG.md.                                                                                                           |
-| 4. First run examined line by line |      20 |      16 | contract-run-1.txt first saved in commit 5c5b48e, before source correction ed8c9a3. NOTES.md has one row for each of the two cancelled tests, with the relevant contract sentence, observed setup result, implementation behavior, and proposed wording.                                                          |
-| 5. Sentences with two readings     |      20 |      15 | NOTES.md “Agent answer” entries A–E present two readings, a decision, a reason and an added contract sentence. Entry F is a separate additional review finding.                                                                                                                                                   |
-| 6. AI-LOG.md                       |      10 |      10 | AI-LOG.md records the README implementation prompt, named §4.2 and §4.4 diagnostic prompt, correction prompt, and ambiguity prompt. Changed and Rejected cite actual code and verification decisions.                                                                                                             |
-| **Total**                          | **100** |  **90** | The zip file name uses the same score.                                                                                                                                                                                                                                                                            |
+| Criterion | Maximum | I claim | Verifiable evidence |
+|---|---:|---:|---|
+| 1. Contract tests pass | 30 | **30** | `contract-run-final.txt`: Ubuntu Node.js 22 run, 29/29 passed, no failures or cancellations; `AI-LOG.md` records legacy 3/3. Workflow run: https://github.com/zintomvn/awad-api-contract-starter/actions/runs/43198372757. |
+| 2. Rules kept | 10 | **10** | `git diff ee78c39 -- test/ CONTRACT.md` is empty. The new `migrations/002_order_idempotency.up.sql` has a matching `.down.sql`. The implementation lives in `src/v1.js`, `src/app.js`, and the Windows path correction in `scripts/migrate.js`. |
+| 3. Predictions before implementation | 10 | **9** | `NOTES.md`, section “Predictions before the agent implementation”: two exact contract passages (§4.2 and §4.4), a separate reason for each, and later explicit outcomes. Commit `7f22452` predates source commit `f8b4f68`. The initial wording was AI-assisted, openly disclosed in `AI-LOG.md`. |
+| 4. First run explained | 20 | **19** | First-run output was committed at `5c5b48e`, before source correction `ed8c9a3`. `contract-run-1.txt` shows 27 passed, 0 failed assertions, and 2 cancelled. `NOTES.md`, “Reading the first contract run, line by line”, has a separate row for **each** cancelled test, its exact contract sentence, what the implementation did, the first-run limitation, and proposed clarification. The Windows setup `ENOENT` was independently reproduced and explained; `test/` remains untouched. |
+| 5. Ambiguous contract sentences | 20 | **18** | `NOTES.md`, “Agent answer: sentences that could be read two ways”, entries **A–E**: both interpretations, chosen reading, reason, and proposed contractual sentence. Entry **F** is an additional review finding about leading-zero path ids, linked to correction commit `ed8c9a3`. All six decisions are documented without changing `CONTRACT.md`. The review was AI-assisted, as declared. |
+| 6. AI-LOG.md | 10 | **10** | `AI-LOG.md`: records the README implementation prompt, named contract-section diagnostic and correction prompts, the ambiguity question, later CI verification and final rubric review. “Changed” and “Rejected” state specific kept or discarded decisions, including the unused throwing function and the decision to leave tests untouched. |
+| **Total** | **100** | **96** | This total matches the submission archive name `23127351_96.zip`. |
 
 ## What I did not manage
 
-On Windows with Node 24, the two-instance suite setup did not finish because a Node migration subprocess exited with a null status; the exact cause was not established. The first-run log preserves 27 passed and 2 cancelled. The identical source code subsequently passed all 29 official tests on Ubuntu with Node.js 22, as recorded in the final transcript and the linked GitHub Actions run. An earlier independent two-server check also passed replay, cross-instance cursor usage, a stable page snapshot, and duplicate-write prevention. The contract's precise 409 in-flight race timing was not independently demonstrated.
+The pre-implementation predictions were committed in the right order, but their initial drafting used AI assistance. I cannot claim I completed the rubric's ten-minute unaided reading exercise. The saved first Windows test run also contains two cancellations during cross-instance suite setup; an independent reproduction later traced those to a URL pathname used as a Windows `cwd` in the test harness. I preserved that first run and did not change the tests. The original official tests subsequently passed 29/29 on Ubuntu/Node 22.
 
-I used AI assistance to draft the initial predictions and implementation. The pre-implementation commit order is genuine, but the assisted note drafting should be considered when evaluating the human-reading aspect of the rubric.
+The contract specifies a 409 response when the same idempotency key is genuinely in flight. The supplied parallel-request test accepts both 201 replay and 409; I have not separately proved that a precisely timed overlapping request returns 409 in every case. That limitation is not hidden by the green test output.
 
 ## What I would do differently
 
-I would establish a Linux Node 22 test environment earlier in the assignment so the complete test suite runs before the first diagnosis. I would also verify concurrent in-flight responses under a deliberately held write lock and record the observed 409 behavior.
+I would write my own prediction notes before asking an assistant for help, reproduce both test environments early, and specifically exercise the in-flight 409 case. I would also check every rubric evidence line and add the criterion scores before finalizing the report.

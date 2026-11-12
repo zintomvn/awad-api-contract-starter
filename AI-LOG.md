@@ -51,4 +51,12 @@ Kept: The existing /v1 implementation and the unchanged test/ and CONTRACT.md fi
 Changed: Saved the successful CI contract output to contract-run-final.txt with the job URL and tested commit identified; updated NOTES.md and SELF_ASSESSMENT_REPORT.md using the new evidence. No source-code correction was necessary.
 Rejected: Introducing a code change merely to address the Windows test-launch anomaly or presenting CI output as a local Windows test run.
 
+## 2026-11-12 — Rubric review, reproducibility check, and packaging
+
+Tool: ChatGPT (GPT-6 via Codex Native2).
+Asked for: Check the current submission against the IA#3 rubric, improve the evidence and self-assessment, reproduce the remaining Windows cancellation, and prepare a complete zip including Git history.
+Kept: The original `contract-run-1.txt`, the successful Ubuntu Node.js 22 `contract-run-final.txt`, the existing /v1 code and migrations, and the original commit sequence.
+Changed: Re-ran migration, seeding, legacy and contract scripts on Windows (legacy 3/3; contract 27 passed, 0 assertions failed, 2 cancelled), then independently reproduced the suite's `spawnSync` failure. Its `new URL('..', import.meta.url).pathname` produces a non-native Windows `cwd` (`/D:/...` with URL-escaped spaces), yielding `ENOENT` and a null process status. Documented the confirmed setup cause in `NOTES.md` and revised the rubric score with specific evidence.
+Rejected: Modifying the forbidden `test/` path to fix the Windows-only suite setup or overwriting the authentic first-run and Linux-final transcripts with a known incomplete Windows rerun. Did not claim that the historical predictions were independently drafted without AI.
+
 No test files or CONTRACT.md were edited, and no new dependency was added.

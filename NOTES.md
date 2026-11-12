@@ -1,6 +1,6 @@
-﻿# Contract reading notes - IA#3
+# Contract reading notes - IA#3
 
-MSSV: 23127351
+Student ID: 23127351
 
 Full Name: Le Minh Duc
 
@@ -25,12 +25,14 @@ Prediction outcomes will be recorded after the first contract run.
 
 ## Reading the first contract run, line by line
 
-The first run (contract-run-1.txt, commit 5c5b48e) had **27 passes, 0 failed assertions, and 2 cancelled tests**. The two cancellations came from a suite setup failure: “npm run migrate failed: undefined” with a null exit status for its Node migration subprocess on Windows. A separate check also found an ENOENT error when trying to spawn npm directly; it did not establish the cause of the suite's migration setup failure. These results are not evidence that the corresponding API behavior failed.
+The first run (contract-run-1.txt, commit 5c5b48e) had **27 passes, 0 failed assertions, and 2 cancelled tests**. Both cancellations occurred before either cross-instance API assertion could run: the suite setup reported “npm run migrate failed: undefined” and a null subprocess exit status. At that time the exact cause was unknown. A later reproduction on Windows isolated the cause of the setup failure, as documented below. Neither cancelled test establishes that the corresponding API behavior failed.
 
 | Cancelled test | Contract sentence | What the agent did / first-run result | Clarifying wording |
 |---|---|---|---|
 | §4.2 a retry that lands on the other instance is still a replay | §4.2: “Same key, same body → the stored response: status 201, the identical body, the same Location...” | The agent stored key, canonical JSON fingerprint, response, and Location in SQLite in the same transaction. The test was **cancelled before reaching the API** because the migration subprocess in setup could not complete on Windows. | “A successful idempotency key must be readable by any service instance using the same database file, and the replay must reproduce the original response.” |
 | §4.4 a cursor from one instance works on the other | §4.4: “A cursor is opaque: the client stores it and sends it back unchanged...” and “A cursor stays valid for at least 24 hours.” | The agent encoded snapshot anchor, last seen id, and table filter into the cursor, permitting decoding by another instance without process memory. This test was **cancelled before it could run** for the same Windows setup failure. | “A cursor returned by one instance must remain usable by another instance sharing the same database.” |
+
+**Windows setup reproduction (later review, not a replacement for the first run):** The two-instance suite calculates its working directory with `new URL('..', import.meta.url).pathname`. On this Windows checkout, that expression returns a URL pathname beginning `/D:/University/Semester%2010/...`, rather than a native Windows filesystem path. Passing that exact string as `cwd` to `spawnSync(process.execPath, ['scripts/migrate.js', 'up'], ...)` independently reproduces `status: null` and `error.code: 'ENOENT'`. This explains the suite's `before` hook failure and the two cancellations. A native file path would come from `fileURLToPath(new URL('..', import.meta.url))`, but **test/ was not edited**, as the assignment forbids it. Linux uses a valid pathname, and the original tests pass there.
 
 **Additional direct verification:** Two HTTP servers with two SQLite connections shared one temporary database. A replay on the other server returned the original 201, identical JSON and Location, and Idempotent-Replayed: true. A cursor issued by server A worked on B; a new order did not shift an existing page; parallel duplicate requests created one order. This manual verification passed. It does not replace the two cancelled rubric tests.
 
