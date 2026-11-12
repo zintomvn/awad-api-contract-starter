@@ -1,0 +1,29 @@
+﻿name: API contract verification
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check Node version
+        run: node --version
+      - name: Apply migrations
+        run: npm run migrate
+      - name: Seed database
+        run: npm run seed
+      - name: Check legacy API
+        run: npm test
+      - name: Check v1 contract
+        run: npm run contract
