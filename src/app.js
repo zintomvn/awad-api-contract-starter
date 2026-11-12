@@ -1,14 +1,14 @@
-import { createServer } from 'node:http';
+﻿import { createServer } from 'node:http';
 import { send, readRaw } from './http.js';
-import { createV1 } from './v1.js';
+import { createV1, sendV1Problem } from './v1.js';
 
-// The service has two faces:
-//   /menu…  the LEGACY, unversioned API that old clients still call. Its
-//           behaviour is frozen: price in thousands of dong, errors as
-//           { error, message }. See CONTRACT.md §5 before touching it.
-//   /v1/…   the versioned API described in CONTRACT.md — src/v1.js.
-
-const legacyError = (res, status, code, message, headers) => send(res, status, { error: code, message }, headers);
+// The legacy routes keep their original JSON shape and thousand-dong prices.
+const legacyHeaders = {
+  Deprecation: '@1792022400',
+  Sunset: 'Thu, 31 Dec 2026 23:59:59 GMT',
+};
+const legacyError = (res, status, code, message, headers) =>
+  send(res, status, { error: code, message }, headers);
 const isPrice = (p) => typeof p === 'number' && Number.isFinite(p) && p > 0 && p <= 100000;
 
 export function createApp(db) {
@@ -18,7 +18,6 @@ export function createApp(db) {
     insert: db.prepare('INSERT INTO menu_items (name, price_vnd) VALUES (?, ?)'),
     setPrice: db.prepare('UPDATE menu_items SET price_vnd = ? WHERE id = ?'),
   };
-  // Old clients read `price` in thousands of dong.
   const legacyView = (row) => ({ id: row.id, name: row.name, price: row.price_vnd / 1000 });
   const v1 = createV1(db);
 
@@ -43,8 +42,10 @@ export function createApp(db) {
     if (parts[0] === 'menu' && parts.length === 2) {
       const id = Number(parts[1]);
       const row = Number.isInteger(id) ? q.get.get(id) : undefined;
-      if (!row) return legacyError(res, 404, 'not_found', `menu item ${parts[1]} not found`, h);
-      if (req.method === 'GET') return send(res, 200, legacyView(row), h);
+      if (!row) return legacyError(res, 404, 'not_found', 'menu item ' + parts[1] + ' not found', h);
+      if (req.method === 'GET') return send(res, 200, legacyView(row), {
+        ...h, Link: '</v1/menu/' + id + '>; rel="successor-version"',
+      });
       if (req.method === 'PATCH') {
         let body; try { body = JSON.parse((await readRaw(req)) || '{}'); } catch { body = null; }
         if (!body || !isPrice(body.price))
@@ -61,15 +62,19 @@ export function createApp(db) {
     const url = new URL(req.url, 'http://x');
     if (req.method === 'GET' && url.pathname === '/health') return send(res, 200, { ok: true });
     if (url.pathname === '/v1' || url.pathname.startsWith('/v1/')) {
-      if (await v1(req, res, url)) return;
+      await v1(req, res, url);
+      return;
     }
-    return legacy(req, res, url, {});
+    return legacy(req, res, url, legacyHeaders);
   }
 
   return createServer((req, res) => {
-    handle(req, res).catch((e) => {
-      console.error(e);
-      if (!res.headersSent) legacyError(res, 500, 'internal', e.message);
+    handle(req, res).catch((error) => {
+      console.error(error);
+      if (res.headersSent) return;
+      const isV1 = req.url === '/v1' || req.url.startsWith('/v1/') || req.url.startsWith('/v1?');
+      if (isV1) sendV1Problem(res, 'internal', 'An unexpected error occurred.');
+      else legacyError(res, 500, 'internal', error.message, legacyHeaders);
     });
   });
 }
